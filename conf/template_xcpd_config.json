@@ -1,0 +1,7 @@
+{
+    "XCPD_VERSION": "0.6.0",
+    "SLURM_CPUS_PER_TASK": 16,
+    "XCPD_MEMORY_GB": 128,
+    "CONFOUND_REGRESSION": "aroma",
+    "SMOOTHING": "6"
+}

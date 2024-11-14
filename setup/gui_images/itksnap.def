@@ -1,0 +1,20 @@
+Bootstrap: docker
+From: ubuntu:23.04
+
+%labels
+    Version v20230803_1837
+
+%arguments
+    OSVERSION=23.04
+    ITKVERSIONSTRING=4.0.1-20230320
+    ITKBASEURL=https://deac-fra.dl.sourceforge.net/project/itk-snap/itk-snap/4.0.1
+
+%post
+    apt -y update
+    apt -y install curl git wget libglx0 libopengl0 libgl1 qt5dxcb-plugin libxcb-xinerama0 libicu-dev
+
+    wget -P /opt {{ ITKBASEURL }}/itksnap-{{ ITKVERSIONSTRING }}-Linux-gcc64.tar.gz
+    tar -xvf /opt/itksnap-{{ ITKVERSIONSTRING }}-Linux-gcc64.tar.gz -C /usr/local --strip-components=1
+
+%runscript
+    /usr/local/bin/itksnap

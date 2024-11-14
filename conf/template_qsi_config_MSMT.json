@@ -1,0 +1,8 @@
+{
+    "FS_VERSION": "6.0.1",
+    "QSIPREP_VERSION": "0.19.1",
+    "SLURM_CPUS_PER_TASK": 24,
+    "QSIPREP_MEMORY_GB": 128,
+    "OUTPUT_RESOLUTION": 2.5,
+    "RECON_SPEC": "mrtrix_multishell_msmt_ACT-hsvs"
+}

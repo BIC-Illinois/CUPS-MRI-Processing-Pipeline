@@ -1,0 +1,4 @@
+{
+    "SLURM_CPUS_PER_TASK": "4",
+    "MATLAB_VERSION": "r2019a"
+}

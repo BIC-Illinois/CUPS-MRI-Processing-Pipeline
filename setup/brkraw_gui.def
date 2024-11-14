@@ -1,0 +1,13 @@
+Bootstrap: docker
+From: python:3.10
+
+%post
+	apt-get update && apt-get upgrade -y && apt-get install git
+	apt-get install -y python3-tk
+	pip install shleeh nibabel numpy pandas pillow tqdm openpyxl xlrd        
+        pip install git+https://github.com/brkraw/bruker
+
+%runscript
+    echo "Starting BrkRaw GUI"
+    echo "To view an existing directory, bin input directory to /datain, output directory to /dataout"
+    exec bash -c "if [ -d /datain ] && [ -d /dataout ]; then brkraw gui -i /datain -o /dataout $@; else brkraw gui $@; fi"

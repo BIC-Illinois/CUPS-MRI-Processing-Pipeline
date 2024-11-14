@@ -1,0 +1,4 @@
+{
+    "SLURM_CPUS_PER_TASK": "16",
+    "HEUDICONV_VERSION": "1.0.0"
+}
