@@ -9,8 +9,8 @@ Shell scripts can be run on Delta using the Delta project ID as the input for de
 
 
 #### To-do list:
-- [ ] Installation tutorial
-- [ ] Add config json examples
+- [X] Installation tutorial
+- [X] Add config json examples
 - [ ] Pipeline config JSON tutorial
 - [ ] Pipeline run tutorial
 - [ ] Commonly used outputs tutorials
