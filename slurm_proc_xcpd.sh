@@ -45,11 +45,11 @@ sub=${subject:4}
 
 # Read version from JSON file using jq in apptainer container
 CONFIG_JSON=${scripts}/conf/${project}_xcpd_config.json
-XCPD_VERSION=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.XCPD_VERSION' /scripts/config.json)
-SLURM_CPUS_PER_TASK=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.SLURM_CPUS_PER_TASK' /scripts/config.json)
-XCPD_MEMORY_GB=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.XCPD_MEMORY_GB' /scripts/config.json)
-CONFOUND_REGRESSION=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.CONFOUND_REGRESSION' /scripts/config.json)
-SMOOTHING=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.SMOOTHING' /scripts/config.json)
+XCPD_VERSION=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.XCPD_VERSION' /scripts/config.json)
+SLURM_CPUS_PER_TASK=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.SLURM_CPUS_PER_TASK' /scripts/config.json)
+XCPD_MEMORY_GB=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.XCPD_MEMORY_GB' /scripts/config.json)
+CONFOUND_REGRESSION=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.CONFOUND_REGRESSION' /scripts/config.json)
+SMOOTHING=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.SMOOTHING' /scripts/config.json)
 # Get the number of CPUs from sbatch job details
 num_cpus=$SLURM_CPUS_PER_TASK
 
@@ -57,8 +57,8 @@ CACHESING=${scachedir}/${project}_${subject}_${sesname}_${CONFOUND_REGRESSION}
 TMPSING=${stmpdir}/${project}_${subject}_${sesname}_${CONFOUND_REGRESSION}
 mkdir $CACHESING -p
 mkdir $TMPSING -p
-chmod 777 -R $CACHESING
-chmod 777 -R $TMPSING
+chmod 730 -R $CACHESING
+chmod 730 -R $TMPSING
 
 cd $projDir
 
@@ -99,9 +99,12 @@ echo "xcp_d started $NOW" >> ${scripts}/fulltimer.txt
 
 APPTAINER_CACHEDIR=${CACHESING} APPTAINER_TMPDIR=${TMPSING} singularity run \
 --cleanenv --no-home --bind ${IMAGEDIR}:/imgdir,${TMPSING}:/sing_scratch,${projDir}:/data \
-${IMAGEDIR}/xcp_d-v${XCPD_VERSION}.sif --participant_label ${subject} --nthreads $num_cpus --omp-nthreads $((num_cpus / 2)) --input-type fmriprep --smoothing $SMOOTHING -p ${CONFOUND_REGRESSION} -f 0 -w "/sing_scratch" --notrack --fs-license-file /imgdir/license.txt /data/${DERIVATIVES_DIR}/fmriprep /data/${DERIVATIVES_DIR} participant
+${IMAGEDIR}/xcp_d-v${XCPD_VERSION}.sif --participant_label ${subject} --nthreads $num_cpus \
+--omp-nthreads $((num_cpus / 2)) --input-type fmriprep --smoothing $SMOOTHING -p ${CONFOUND_REGRESSION} \
+-f 0 -w "/sing_scratch" --notrack --fs-license-file /imgdir/license.txt \
+/data/${DERIVATIVES_DIR}/fmriprep /data/${DERIVATIVES_DIR} participant
 
-chmod 744 -R ${projDir}/bids/derivatives/xcp_d/${subject}/${sesname}
+chmod 730 -R ${projDir}/bids/derivatives/xcp_d/${subject}/${sesname}
 
 else
 echo "No rsfMRI data for ${subject} ${sesname}" >> ${scripts}/fulltimer.txt
