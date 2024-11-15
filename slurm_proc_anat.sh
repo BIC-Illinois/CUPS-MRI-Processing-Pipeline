@@ -109,13 +109,13 @@ if [ ! -f "${CONFIG_JSON}" ]; then
     echo "Config file not found"
     exit 17
 fi
-FMRIPREP_VERSION=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.FMRIPREP_VERSION' /scripts/config.json)
-SLURM_CPUS_PER_TASK=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.SLURM_CPUS_PER_TASK' /scripts/config.json)
-FMRIPREP_MEMORY_GB=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.FMRIPREP_MEMORY_GB' /scripts/config.json)
-MRIQC_VERSION=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.MRIQC_VERSION' /scripts/config.json)
-ANAT_ONLY=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.ANAT_ONLY' /scripts/config.json)
-LAYNII_VERSION=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.LAYNII_VERSION' /scripts/config.json)
-LAYNII_DENOISE_BETA=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.LAYNII_DENOISE_BETA' /scripts/config.json)
+FMRIPREP_VERSION=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.FMRIPREP_VERSION' /scripts/config.json)
+SLURM_CPUS_PER_TASK=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.SLURM_CPUS_PER_TASK' /scripts/config.json)
+FMRIPREP_MEMORY_GB=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.FMRIPREP_MEMORY_GB' /scripts/config.json)
+MRIQC_VERSION=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.MRIQC_VERSION' /scripts/config.json)
+ANAT_ONLY=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.ANAT_ONLY' /scripts/config.json)
+LAYNII_VERSION=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.LAYNII_VERSION' /scripts/config.json)
+LAYNII_DENOISE_BETA=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.LAYNII_DENOISE_BETA' /scripts/config.json)
 # if ANAT_ONLY "null", exit code 42 for wrong script
 if [ "${ANAT_ONLY}" == "null" ]; then
     echo "ANAT_ONLY is null, please use the correct script"
