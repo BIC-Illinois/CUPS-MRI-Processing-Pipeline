@@ -5,5 +5,6 @@
     "MRIQC_VERSION": "24.0.2",
     "MRIQC_NOSUB": true,
     "ANAT_ONLY": true,
-    "LAYNII_VERSION": "2.0.0"
+    "LAYNII_VERSION": "2.0.0",
+    "LAYNII_DENOISE_BETA": "0.4"
 }
