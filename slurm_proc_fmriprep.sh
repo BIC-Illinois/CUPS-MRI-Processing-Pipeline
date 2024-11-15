@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script is used to run fMRIPrep source rsMRI data.
+# This script is used to run fMRIPrep rs-fMRI data.
 
 while getopts :p:s:z:m:f:l:b:t:a: option; do
     case ${option} in
@@ -57,8 +57,8 @@ CACHESING=${scachedir}/${project}_${subject}_${sesname}_${CONFOUND_REGRESSION}
 TMPSING=${stmpdir}/${project}_${subject}_${sesname}_${CONFOUND_REGRESSION}
 mkdir $CACHESING -p
 mkdir $TMPSING -p
-chmod 777 -R $CACHESING
-chmod 777 -R $TMPSING
+chmod 730 -R $CACHESING
+chmod 730 -R $TMPSING
 
 cd $projDir
 
@@ -83,8 +83,8 @@ else
     fi
 fi
 
-chmod 777 -R $CACHESING
-chmod 777 -R $TMPSING
+chmod 730 -R $CACHESING
+chmod 730 -R $TMPSING
 
 TEMPLATEFLOW_HOST_HOME=$IMAGEDIR/templateflow
 export APPTAINERENV_TEMPLATEFLOW_HOME="/imgdir/templateflow"
@@ -101,7 +101,7 @@ APPTAINER_CACHEDIR=${CACHESING} APPTAINER_TMPDIR=${TMPSING} singularity run \
 --cleanenv --no-home --bind ${IMAGEDIR}:/imgdir,${TMPSING}:/sing_scratch,${projDir}:/data \
 ${IMAGEDIR}/fmriprep-v${FMRIPREP_VERSION}.sif --participant_label ${subject} --nthreads $num_cpus --omp-nthreads $((num_cpus / 2)) --input-type fmriprep --smoothing $SMOOTHING -p ${CONFOUND_REGRESSION} -f 0 -w "/sing_scratch" --notrack --fs-license-file /imgdir/license.txt /data/${DERIVATIVES_DIR}/fmriprep /data/${DERIVATIVES_DIR} participant
 
-chmod 744 -R ${projDir}/bids/derivatives/fmriprep/${subject}/${sesname}
+chmod 740 -R ${projDir}/bids/derivatives/fmriprep/${subject}/${sesname}
 
 else
 echo "No rsfMRI data for ${subject} ${sesname}" >> ${scripts}/fulltimer.txt
