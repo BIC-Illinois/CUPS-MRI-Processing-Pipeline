@@ -179,8 +179,8 @@ fi
 
 mkdir $CACHESING -p
 mkdir $TMPSING -p
-chmod 777 -R $CACHESING
-chmod 777 -R $TMPSING
+chmod 730 -R $CACHESING
+chmod 730 -R $TMPSING
 
 TEMPLATEFLOW_HOST_HOME=$IMAGEDIR/templateflow
 export SINGULARITYENV_TEMPLATEFLOW_HOME="/imgdir/templateflow"
