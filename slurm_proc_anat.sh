@@ -114,6 +114,7 @@ FMRIPREP_MEMORY_GB=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${I
 MRIQC_VERSION=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.MRIQC_VERSION' /scripts/config.json)
 ANAT_ONLY=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.ANAT_ONLY' /scripts/config.json)
 LAYNII_VERSION=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.LAYNII_VERSION' /scripts/config.json)
+LAYNII_DENOISE_BETA=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.LAYNII_DENOISE_BETA' /scripts/config.json)
 # if ANAT_ONLY "null", exit code 42 for wrong script
 if [ "${ANAT_ONLY}" == "null" ]; then
     echo "ANAT_ONLY is null, please use the correct script"
@@ -129,7 +130,9 @@ anat_dir="${projDir}/bids/sourcedata/sub-${sub}/ses-${ses}/anat"
 # if version is terra and mp2rage files exist in ${anat_dir}, then we denoise the MP2RAGE UNI image using LAYNII
 if [ "${version}" == "terra" ] && [ -f "${anat_dir}/sub-${sub}_ses-${ses}_acq-mp2rageinv_run-1_T1w.nii.gz" ] && [ -f "${anat_dir}/sub-${sub}_ses-${ses}_acq-mp2rageinv_run-2_T1w.nii.gz" ] && [ -f "${anat_dir}/sub-${sub}_ses-${ses}_acq-mp2rageuni_run-3_T1w.nii.gz" ]; then
     echo "Denoising MP2RAGE with LAYNII"
-	SINGULARITY_CACHEDIR=$CACHESING SINGULARITY_TMPDIR=$TMPSING singularity exec --cleanenv --bind ${anat_dir}:/datain $IMAGEDIR/laynii-2.0.0.sif /opt/laynii2/laynii/LN_MP2RAGE_DNOISE -INV1 /datain/sub-${sub}_ses-${ses}_acq-mp2rageinv_run-1_T1w.nii.gz -INV2 /datain/sub-${sub}_ses-${ses}_acq-mp2rageinv_run-2_T1w.nii.gz -UNI /datain/sub-${sub}_ses-${ses}_acq-mp2rageuni_run-3_T1w.nii.gz -beta 0.2
+	SINGULARITY_CACHEDIR=$CACHESING SINGULARITY_TMPDIR=$TMPSING singularity exec --cleanenv --bind ${anat_dir}:/datain $IMAGEDIR/laynii-2.0.0.sif \
+        /opt/laynii2/laynii/LN_MP2RAGE_DNOISE -INV1 /datain/sub-${sub}_ses-${ses}_acq-mp2rageinv_run-1_T1w.nii.gz \
+        -INV2 /datain/sub-${sub}_ses-${ses}_acq-mp2rageinv_run-2_T1w.nii.gz -UNI /datain/sub-${sub}_ses-${ses}_acq-mp2rageuni_run-3_T1w.nii.gz -beta ${LAYNII_DENOISE_BETA}
 	mv ${anat_dir}/*inv* ${projDir}/bids/derivatives/
 	mv ${anat_dir}/*uni_run-*_T1w.nii.gz ${projDir}/bids/derivatives/
 	mv ${anat_dir}/*uni_run-*_T1w.json ${projDir}/bids/derivatives/
