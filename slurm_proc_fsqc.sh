@@ -70,7 +70,7 @@ else
     fi
 fi
 
-FSQC_IMAGE=${IMAGEDIR}/fsqc-v2.1.0.sif
+FSQC_IMAGE=${IMAGEDIR}/fsqc-v2.1.1.sif
 FS_DIR=${projDir}/bids/derivatives/sourcedata/freesurfer
 FSQC_DIR=${projDir}/bids/derivatives/fsqc
 
