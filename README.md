@@ -3,6 +3,13 @@ MRI processing pipeline set-up, configuration, and wrappers
 
 Shell scripts can be run on Delta using the Delta project ID as the input for delta_proj, or on other machines using the "local" as the input for delta_proj and your processing directory as the base_dir argument
 
+## Usage:
+
+Conversion from DICOM to BIDS NIFTI & JSON is performed with:
+
+Each step of the pipeline can be queued with their respective slurm scripts. The following order should be followed:
+
+
 ### Related repos:
 * [DICOM to BIDS conversion](https://github.com/BIC-Illinois/XNAT2BIDS)
 * [Quantitative Susceptibility Mapping](https://github.com/BIC-Illinois/QSM)
@@ -12,8 +19,4 @@ Shell scripts can be run on Delta using the Delta project ID as the input for de
 - [X] Installation tutorial
 - [X] Add config json examples
 - [X] Add heudiconv, fieldmaps cript
-- [ ] Pipeline config JSON tutorial
-- [ ] Pipeline run tutorial
-- [ ] Commonly used outputs tutorials
-- [ ] External resources
-- [ ] ReadTheDocs setup - *optional, only compatible with public repositories*
+- [ ] Pipeline run tutorial/usage
