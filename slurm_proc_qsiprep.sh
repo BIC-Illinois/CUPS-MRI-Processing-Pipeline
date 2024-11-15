@@ -147,7 +147,7 @@ ${IMAGEDIR}/qsiprep-v${QSIPREP_VERSION}.sif \
 --output-resolution ${OUTPUT_RESOLUTION} -w /sing_scratch \
 --nthreads ${num_cpus} --omp-nthreads $((num_cpus / 2)) --mem_mb $((QSIPREP_MEMORY_GB * 1000)) \
 --separate-all-dwis -vv --notrack \
---freesurfer-input ${fs_dir} \
+--freesurfer-input ${fs_dir} --denoise_method patch2self \
 --bids-filter-file /data/${DERIVATIVES_DIR}/qsiprep/${project}_${ses}_bids_filter.json \
 participant --participant-label ${subject}
 
