@@ -88,6 +88,9 @@ chmod 730 -R $TMPSING
 
 TEMPLATEFLOW_HOST_HOME=$IMAGEDIR/templateflow
 export APPTAINERENV_TEMPLATEFLOW_HOME="/imgdir/templateflow"
+MPLCONFIGDIR="${CACHESING}/mpl"
+mkdir ${MPLCONFIGDIR}
+export SINGULARITYENV_MPLCONFIGDIR="/sing_scratch/mpl"
 
 if [ -d "${projDir}/${SOURCEDATA_DIR}/${subject}/${sesname}/func" ];
 then
