@@ -43,6 +43,26 @@ while getopts :p:s:z:m:f:l:b:t:a: option; do
     esac
 done
 
+
+## setup our variables and change to the session directory
+
+echo ${CLEANPROJECT}
+echo ${CLEANSUBJECT}
+echo ${CLEANSESSION}
+pwd
+
+#translating naming conventions
+echo "${CLEANSESSION: -1}"
+session="${CLEANSESSION: -1}"
+echo ${session}
+project=${CLEANPROJECT}
+
+subject="sub-"${CLEANSUBJECT}
+sesname="ses-"${session}
+
+ses=${sesname:4}
+sub=${subject:4}
+
 # if delta_proj is not "local", set the following variables
 if [ "${delta_proj}" != "local" ]; then
     IMAGEDIR=/projects/${delta_proj}/singularity_images
@@ -81,25 +101,6 @@ else
     fi
 fi
 
-
-## setup our variables and change to the session directory
-
-echo ${CLEANPROJECT}
-echo ${CLEANSUBJECT}
-echo ${CLEANSESSION}
-pwd
-
-#translating naming conventions
-echo "${CLEANSESSION: -1}"
-session="${CLEANSESSION: -1}"
-echo ${session}
-project=${CLEANPROJECT}
-
-subject="sub-"${CLEANSUBJECT}
-sesname="ses-"${session}
-
-ses=${sesname:4}
-sub=${subject:4}
 
 # Read version from JSON file using jq in apptainer container
 CONFIG_JSON=${scripts}/conf/${project}_config.json
