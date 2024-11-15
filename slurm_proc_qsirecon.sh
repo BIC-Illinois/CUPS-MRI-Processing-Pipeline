@@ -75,11 +75,11 @@ echo "reading configuration from  ${CONFIG_JSON}"
 # Read version from JSON file using jq in apptainer container
 CONFIG_JSON=${scripts}/conf/${project}_qsi_config.json
 echo "reading configuration from  ${CONFIG_JSON}"
-QSIPREP_VERSION=$(singularity exec --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.QSIPREP_VERSION' /scripts/config.json)
-SLURM_CPUS_PER_TASK=$(singularity exec --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.SLURM_CPUS_PER_TASK' /scripts/config.json)
-QSIPREP_MEMORY_GB=$(singularity exec --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.QSIPREP_MEMORY_GB' /scripts/config.json)
-OUTPUT_RESOLUTION=$(singularity exec --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.OUTPUT_RESOLUTION' /scripts/config.json)
-RECON_SPEC=$(singularity exec --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.RECON_SPEC' /scripts/config.json)
+QSIPREP_VERSION=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.QSIPREP_VERSION' /scripts/config.json)
+SLURM_CPUS_PER_TASK=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.SLURM_CPUS_PER_TASK' /scripts/config.json)
+QSIPREP_MEMORY_GB=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.QSIPREP_MEMORY_GB' /scripts/config.json)
+OUTPUT_RESOLUTION=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.OUTPUT_RESOLUTION' /scripts/config.json)
+RECON_SPEC=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.RECON_SPEC' /scripts/config.json)
 # Get the number of CPUs from sbatch job details
 num_cpus=${SLURM_CPUS_PER_TASK}
 echo "${QSIPREP_VERSION} ${RECON_SPEC} ${SLURM_CPUS_PER_TASK}"
@@ -113,11 +113,14 @@ fi
 
 mkdir $CACHESING -p
 mkdir $TMPSING -p
-# chmod 777 -R $CACHESING
-# chmod 777 -R $TMPSING
+chmod 730 -R $CACHESING
+chmod 730 -R $TMPSING
 
 TEMPLATEFLOW_HOST_HOME=$IMAGEDIR/templateflow
 export APPTAINERENV_TEMPLATEFLOW_HOME="/imgdir/templateflow"
+MPLCONFIGDIR="${CACHESING}/mpl"
+mkdir ${MPLCONFIGDIR}
+export SINGULARITYENV_MPLCONFIGDIR="/sing_scratch/mpl"
 
 if [ -d "${projDir}/bids/sourcedata_${sesname}/${subject}/${sesname}/dwi" ];
 then
@@ -125,23 +128,20 @@ then
 NOW=$(date +"%m-%d-%Y-%T")
 echo "QSIprep started $NOW" >> ${scripts}/fulltimer.txt
 
-# OMP_NTHREADS_VAL=$[SLURM_CPUS_PER_TASK-4]
-mkdir ${CACHESING}/mpl -p && chmod 777 ${CACHESING}/mpl
 APPTAINERENV_MPLCONFIGDIR=/sing_scratch/mpl APPTAINER_CACHEDIR=${CACHESING} APPTAINER_TMPDIR=${TMPSING} singularity run \
 --no-home --cleanenv --bind ${IMAGEDIR}:/imgdir,${CACHESING}:/sing_scratch,${projDir}:/data \
 ${IMAGEDIR}/qsiprep-v${QSIPREP_VERSION}.sif \
 --fs-license-file /imgdir/license.txt /data/${SOURCEDATA_DIR} /data/${DERIVATIVES_DIR} \
 --output-resolution ${OUTPUT_RESOLUTION} -w /sing_scratch \
 --nthreads ${num_cpus} --omp-nthreads $((num_cpus / 2)) --mem_mb $((QSIPREP_MEMORY_GB * 1000)) \
---separate-all-dwis \
 -vvv --notrack --recon_input /data/${DERIVATIVES_DIR}/qsiprep \
---freesurfer-input ${fs_dir} --skip-odf-reports \
---recon_spec ${RECON_SPEC} --recon_only \
+--freesurfer-input ${fs_dir} \
+--recon_spec ${RECON_SPEC} \
 participant --participant-label ${subject}
 
 # --bids-filter-file /data/${DERIVATIVES_DIR}/qsiprep/${project}_${ses}_bids_filter.json \
  
-chmod 744 -R ${projDir}/${DERIVATIVES_DIR}/qsirecon/${subject}/${sesname}
+chmod 730 -R ${projDir}/${DERIVATIVES_DIR}/qsirecon/${subject}/${sesname}
 NOW=$(date +"%m-%d-%Y-%T")
 echo "QSIprep finished $NOW" >> ${scripts}/fulltimer.txt
 
