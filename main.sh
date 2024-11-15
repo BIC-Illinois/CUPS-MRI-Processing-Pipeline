@@ -28,24 +28,30 @@ else
 fi
 
 
-sbatch -a 1 --partition=bic7t --account=${account}--time=8:00:00 --mincpus=12 --mem=192G \
+sbatch -a 1 --partition=bic7t --account=${account}--time=48:00:00 --mincpus=12 --mem=192G \
 --mail-type=begin --mail-type=end --mail-type=fail --mail-user=pcamach2@illinois.edu \
 /projects/illinois/las/neuro/traceyws/BICpipeline/terra/scripts/slurm_proc_fmriprep.sh \
 -p ${project} -s ${session} -z ${participant} -b ${base_dir} -t terra -a ${delta_proj}
 
 sbatch -a 1 --begin=now+4hours --partition=bic7t --account=${account} \
---time=36:00:00 --mincpus=24 --mem=256G --mail-type=begin --mail-type=end \
+--time=09:00:00 --mincpus=24 --mem=256G --mail-type=begin --mail-type=end \
 --mail-type=fail --mail-user=pcamach2@illinois.edu \
-/projects/illinois/las/neuro/traceyws/BICpipeline/terra/scripts/.sh \
+/projects/illinois/las/neuro/traceyws/BICpipeline/terra/scripts/slurm_proc_xcpd.sh \
+-p ${project} -s ${session} -z ${participant} -b ${base_dir} -t terra -a ${delta_proj}
+
+sbatch -a 1 --begin=now+4hours --partition=bic7t --account=${account} \
+--time=0:40:00 --mincpus=24 --mem=256G --mail-type=begin --mail-type=end \
+--mail-type=fail --mail-user=pcamach2@illinois.edu \
+/projects/illinois/las/neuro/traceyws/BICpipeline/terra/scripts/slurm_proc_fsqc.sh \
 -p ${project} -s ${session} -z ${participant} -b ${base_dir} -t terra -a ${delta_proj}
 
 sbatch -a 1 --begin=now+4hours --partition=bic7t --account=${account} --time=8:00:00 \
 --mincpus=24 --mem=256G --mail-type=begin --mail-type=end --mail-type=fail --mail-user=pcamach2@illinois.edu \
-/projects/illinois/las/neuro/traceyws/BICpipeline/terra/scripts/.sh \
+/projects/illinois/las/neuro/traceyws/BICpipeline/terra/scripts/slurm_proc_qsiprep.sh \
 -p ${project} -s ${session} -z ${participant} -b ${base_dir} -t terra -a ${delta_proj}
 
-sbatch -a 1 --begin=now+24hours --partition=bic7t --account=${account} --time=16:00:00 \
+sbatch -a 1 --begin=now+24hours --partition=bic7t --account=${account} --time=10:00:00 \
 --mincpus=24 --mem=256G --mail-type=begin --mail-type=end --mail-type=fail --mail-user=pcamach2@illinois.edu \
-/projects/illinois/las/neuro/traceyws/BICpipeline/terra/scripts/.sh \
+/projects/illinois/las/neuro/traceyws/BICpipeline/terra/scripts/slurm_proc_qsirecon.sh \
 -p ${project} -s ${session} -z ${participant} -b ${base_dir} -t terra -a ${delta_proj}
 
