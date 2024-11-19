@@ -1,7 +1,7 @@
 #!/bin/bash
 # This script is used to perform heudiconv conversion from DICOM to BIDS NIFTI.
 # It takes various input parameters and sets up the necessary environment variables.
-# The script then runs the BIDS App command using Singularity/Apptainer containers.
+# The script then runs the BIDS App command using Apptainer/Apptainer containers.
 
 # Input parameters:
 # -p: CLEANPROJECT - The project name
@@ -15,7 +15,7 @@
 # -a: delta_proj - The delta project name
 
 # Environment variables:
-# - IMAGEDIR - The directory containing Singularity images
+# - IMAGEDIR - The directory containing Apptainer images
 # - scripts - The directory containing scripts
 # - stmpdir - The scratch temporary directory
 # - scachedir - The scratch cache directory
@@ -23,7 +23,7 @@
 # - ses - The session number
 # - sub - The subject number
 # - TEMPLATEFLOW_HOST_HOME - The TemplateFlow host home directory
-# - SINGULARITYENV_TEMPLATEFLOW_HOME - The TemplateFlow environment variable
+# - APPTAINERENV_TEMPLATEFLOW_HOME - The TemplateFlow environment variable
 
 # Usage: slurm_hdc.sh -p <project> -s <session> -z <subject> -m <minqc> -f <fieldmaps> -l <longitudinal> -b <base_dir> -t <version> -a <delta_proj>
 # Example: sbatch slurm_hdc.sh -p BIC -s ses-01 -z 001 -m no -f yes -l yes -b /scratch/${delta_proj}/BICpipeline -t prisma -a bcgn
@@ -62,7 +62,7 @@ sub=${subject:4}
 
 # if delta_proj is not "local", set the following variables
 if [ "${delta_proj}" != "local" ]; then
-    IMAGEDIR=/projects/${delta_proj}/singularity_images
+    IMAGEDIR=/projects/${delta_proj}/apptainer_images
     scripts=/projects/${delta_proj}/scripts
     stmpdir=/scratch/${delta_proj}/stmp
     scachedir=/scratch/${delta_proj}/scache
@@ -70,7 +70,7 @@ if [ "${delta_proj}" != "local" ]; then
     scripts=/projects/${delta_proj}/scripts
 # other wise paths start with ${base_dir}
 else
-    IMAGEDIR=${base_dir}/singularity_images
+    IMAGEDIR=${base_dir}/apptainer_images
     scripts=${base_dir}/${version}/scripts
     stmpdir=${base_dir}/${version}/scratch/stmp
     scachedir=${base_dir}/${version}/scratch/scache
@@ -78,20 +78,20 @@ else
     scripts=${base_dir}/${version}/scripts
 fi
 
-# if singularity is not found and apptainer is not found in the path, exit code 20 for lacking singularity or apptainer
-if which singularity; then
-    echo `singularity --version`
+# if apptainer is not found and apptainer is not found in the path, exit code 20 for lacking apptainer or apptainer
+if which apptainer; then
+    echo `apptainer --version`
 elif which apptainer; then
     echo `apptainer --version`
 else
-    echo "singularity and apptainer not in path"
-    # try to load singularity or apptainer module, if neither works exit code 20 for lacking singularity or apptainer
-    if module load singularity; then
-        echo `singularity --version`
+    echo "apptainer and apptainer not in path"
+    # try to load apptainer or apptainer module, if neither works exit code 20 for lacking apptainer or apptainer
+    if module load apptainer; then
+        echo `apptainer --version`
     elif module load apptainer; then
         echo `apptainer --version`
     else
-        echo "singularity and apptainer not in path"
+        echo "apptainer and apptainer not in path"
         exit 20
     fi
 fi
@@ -108,8 +108,8 @@ if [ ! -f "${CONFIG_JSON}" ]; then
     exit 17
 fi
 
-SLURM_CPUS_PER_TASK=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.SLURM_CPUS_PER_TASK' /scripts/config.json)
-HEUDICONV_VERSION=$(singularity exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.HEUDICONV_VERSION' /scripts/config.json)
+SLURM_CPUS_PER_TASK=$(apptainer exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.SLURM_CPUS_PER_TASK' /scripts/config.json)
+HEUDICONV_VERSION=$(apptainer exec -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.HEUDICONV_VERSION' /scripts/config.json)
 
 # Get the number of CPUs from sbatch job details
 num_cpus=$SLURM_CPUS_PER_TASK
@@ -151,7 +151,7 @@ chmod 730 -R $CACHESING
 chmod 730 -R $TMPSING
 
 TEMPLATEFLOW_HOST_HOME=$IMAGEDIR/templateflow
-export SINGULARITYENV_TEMPLATEFLOW_HOME="/imgdir/templateflow"
+export APPTAINERENV_TEMPLATEFLOW_HOME="/imgdir/templateflow"
 
 	NOW=$(date +"%m-%d-%Y-%T")
 	echo "HeuDiConv started $NOW" >> ${scripts}/fulltimer.txt
@@ -162,9 +162,9 @@ export SINGULARITYENV_TEMPLATEFLOW_HOME="/imgdir/templateflow"
 	ses=${sesname:4}
 	sub=${subject:4}
 
-SINGULARITY_CACHEDIR=$CACHESING \
-SINGULARITY_TMPDIR=$TMPSING \
-singularity exec --cleanenv --bind ${projDir}:/datain ${IMAGEDIR}/heudiconv-v1.0.0.sif \
+APPTAINER_CACHEDIR=$CACHESING \
+APPTAINER_TMPDIR=$TMPSING \
+apptainer exec --cleanenv --bind ${projDir}:/datain ${IMAGEDIR}/heudiconv-v1.0.0.sif \
 heudiconv -d /datain/{subject}/{session}/scans/SCANS/*/DICOM/*dcm \
 -f /datain/${project}_heuristic.py \
 -o /datain/bids/sourcedata --minmeta \
@@ -175,9 +175,9 @@ echo "HeuDiConv finished $NOW" >> ${scripts}/fulltimer.txt
 
 if [ "${fieldmaps}" == "yes" ];
 then
-    SINGULARITY_CACHEDIR=$CACHESING \
-    SINGULARITY_TMPDIR=$TMPSING \
-    singularity exec --bind ${projDir}:/data,${scripts}:/scripts ${IMAGEDIR}/ubuntu-jq-0.1.sif \
+    APPTAINER_CACHEDIR=$CACHESING \
+    APPTAINER_TMPDIR=$TMPSING \
+    apptainer exec --bind ${projDir}:/data,${scripts}:/scripts ${IMAGEDIR}/ubuntu-jq-0.1.sif \
     /scripts/jsoncrawler.sh /data/bids/sourcedata ${sesname} ${subject}
 fi
 	

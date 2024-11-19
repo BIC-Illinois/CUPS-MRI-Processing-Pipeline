@@ -34,10 +34,31 @@ project=${CLEANPROJECT}
 subject="sub-"${CLEANSUBJECT}
 sesname="ses-"${session}
 
+# if delta_proj is not "local", set the following variables
+if [ "${delta_proj}" != "local" ]; then
+    IMAGEDIR=/projects/bcgn/apptainer_images
+    tmpdir=/work/hdd/${delta_proj}/tmp
+    scripts=/work/hdd/${delta_proj}/scripts
+    stmpdir=/work/hdd/${delta_proj}/stmp
+    scachedir=/work/hdd/${delta_proj}/scache
+    projDir=/work/hdd/${delta_proj}/BICpipeline/${version}/testing/${project}
+    scripts=/projects/${delta_proj}/BICpipeline/${version}/scripts/cups
+# /projects/bdpf/BICpipeline/terra/scripts/cups
+# other wise paths start with ${base_dir}
+else
+    IMAGEDIR=${base_dir}/apptainer_images
+    tmpdir=${base_dir}/${version}/tmp
+    scripts=${base_dir}/${version}/scripts
+    stmpdir=${base_dir}/${version}/scratch/stmp
+    scachedir=${base_dir}/${version}/scratch/scache
+    projDir=${base_dir}/${version}/testing/${project}
+    scripts=${base_dir}/${version}/scripts
+fi
+
 projDir=/scratch/${delta_proj}/BICpipeline/prisma/testing/${project}
 scripts=/projects/${delta_proj}/scripts
 
-IMAGEDIR=/projects/${delta_proj}/singularity_images
+IMAGEDIR=/projects/bcgn/singularity_images
 
 
 ses=${sesname:4}
@@ -97,7 +118,7 @@ echo "xcp_d started $NOW" >> ${scripts}/fulltimer.txt
 
 # OMP_NTHREADS_VAL=$[SLURM_CPUS_PER_TASK-4]
 
-APPTAINER_CACHEDIR=${CACHESING} APPTAINER_TMPDIR=${TMPSING} apptainer run \
+APPTAINER_CACHEDIR=${CACHESING} APPTAINER_TMPDIR=${TMPSING} singularity run \
 --cleanenv --no-home --bind ${IMAGEDIR}:/imgdir,${TMPSING}:/sing_scratch,${projDir}:/data \
 ${IMAGEDIR}/xcp_d-v${XCPD_VERSION}.sif --participant_label ${subject} --nthreads $num_cpus \
 --omp-nthreads $((num_cpus / 2)) --input-type fmriprep --smoothing $SMOOTHING -p ${CONFOUND_REGRESSION} \

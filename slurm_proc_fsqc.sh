@@ -12,7 +12,7 @@
 # -a: delta_proj - The delta project name
 
 # Environment variables:
-# - IMAGEDIR - The directory containing Singularity images
+# - IMAGEDIR - The directory containing Apptainer images
 # - scripts - The directory containing scripts
 # - stmpdir - The scratch temporary directory
 # - scachedir - The scratch cache directory
@@ -20,7 +20,7 @@
 # - ses - The session number
 # - sub - The subject number
 # - TEMPLATEFLOW_HOST_HOME - The TemplateFlow host home directory
-# - SINGULARITYENV_TEMPLATEFLOW_HOME - The TemplateFlow environment variable
+# - APPTAINERENV_TEMPLATEFLOW_HOME - The TemplateFlow environment variable
 
 # Usage: slurm_proc_fsqc.sh -p <project> -b <base_dir> -t <version> -a <delta_proj>
 # Example: sbatch slurm_proc_fsqc.sh -p BIC -b /scratch/${delta_proj}/BICpipeline -t prisma -a bcgn
@@ -36,7 +36,7 @@ done
 
 # if delta_proj is not "local", set the following variables
 if [ "${delta_proj}" != "local" ]; then
-    IMAGEDIR=/projects/${delta_proj}/singularity_images
+    IMAGEDIR=/projects/${delta_proj}/apptainer_images
     scripts=/projects/${delta_proj}/scripts
     stmpdir=/scratch/${delta_proj}/stmp
     scachedir=/scratch/${delta_proj}/scache
@@ -44,7 +44,7 @@ if [ "${delta_proj}" != "local" ]; then
     scripts=/projects/${delta_proj}/scripts
 # other wise paths start with ${base_dir}
 else
-    IMAGEDIR=${base_dir}/singularity_images
+    IMAGEDIR=${base_dir}/apptainer_images
     scripts=${base_dir}/${version}/scripts
     stmpdir=${base_dir}/${version}/scratch/stmp
     scachedir=${base_dir}/${version}/scratch/scache
@@ -52,20 +52,20 @@ else
     scripts=${base_dir}/${version}/scripts
 fi
 
-# if singularity is not found and apptainer is not found in the path, exit code 20 for lacking singularity or apptainer
-if which singularity; then
-    echo `singularity --version`
+# if apptainer is not found and apptainer is not found in the path, exit code 20 for lacking apptainer or apptainer
+if which apptainer; then
+    echo `apptainer --version`
 elif which apptainer; then
     echo `apptainer --version`
 else
-    echo "singularity and apptainer not in path"
-    # try to load singularity or apptainer module, if neither works exit code 20 for lacking singularity or apptainer
-    if module load singularity; then
-        echo `singularity --version`
+    echo "apptainer and apptainer not in path"
+    # try to load apptainer or apptainer module, if neither works exit code 20 for lacking apptainer or apptainer
+    if module load apptainer; then
+        echo `apptainer --version`
     elif module load apptainer; then
         echo `apptainer --version`
     else
-        echo "singularity and apptainer not in path"
+        echo "apptainer and apptainer not in path"
         exit 20
     fi
 fi
