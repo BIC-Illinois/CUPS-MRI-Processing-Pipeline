@@ -97,7 +97,7 @@ echo "xcp_d started $NOW" >> ${scripts}/fulltimer.txt
 
 # OMP_NTHREADS_VAL=$[SLURM_CPUS_PER_TASK-4]
 
-APPTAINER_CACHEDIR=${CACHESING} APPTAINER_TMPDIR=${TMPSING} singularity run \
+APPTAINER_CACHEDIR=${CACHESING} APPTAINER_TMPDIR=${TMPSING} apptainer run \
 --cleanenv --no-home --bind ${IMAGEDIR}:/imgdir,${TMPSING}:/sing_scratch,${projDir}:/data \
 ${IMAGEDIR}/xcp_d-v${XCPD_VERSION}.sif --participant_label ${subject} --nthreads $num_cpus \
 --omp-nthreads $((num_cpus / 2)) --input-type fmriprep --smoothing $SMOOTHING -p ${CONFOUND_REGRESSION} \
