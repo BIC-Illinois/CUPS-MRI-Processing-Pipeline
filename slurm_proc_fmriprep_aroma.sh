@@ -116,7 +116,7 @@ mkdir ${projDir}/${DERIVATIVES_DIR}/fmriprep_aroma -p
 APPTAINER_CACHEDIR=${CACHESING} APPTAINER_TMPDIR=${TMPSING} apptainer run \
 --contain --cleanenv --no-home --bind ${IMAGEDIR}:/imgdir,${TMPSING}:/sing_scratch,${projDir}:/data \
 ${IMAGEDIR}/fmriprep-v23.0.2.sif --participant_label ${subject} --nthreads $num_cpus --omp-nthreads $((num_cpus / 2)) \
--w "/sing_scratch" --notrack --use-aroma \
+--level full -w "/sing_scratch" --notrack --use-aroma \
 --fs-license-file /imgdir/license.txt /data/${SOURCEDATA_DIR} /data/${DERIVATIVES_DIR}/fmriprep participant
 
 chmod 740 -R ${projDir}/bids/derivatives/fmriprep/${subject}/${sesname}

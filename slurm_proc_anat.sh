@@ -1,7 +1,7 @@
 #!/bin/bash
 # This script is used to run MRIQC and fMRIPrep anat only preprocessing on anatomical data.
 # It takes various input parameters and sets up the necessary environment variables.
-# The script then runs the BIDS App command using Apptainer/Apptainer containers.
+# The script then runs the BIDS App command using Singularity/Apptainer containers.
 
 # Input parameters:
 # -p: CLEANPROJECT - The project name
@@ -15,7 +15,7 @@
 # -a: delta_proj - The delta project name
 
 # Environment variables:
-# - IMAGEDIR - The directory containing Apptainer images
+# - IMAGEDIR - The directory containing Singularity images
 # - tmpdir - The temporary directory
 # - scripts - The directory containing scripts
 # - stmpdir - The scratch temporary directory
@@ -24,7 +24,7 @@
 # - ses - The session number
 # - sub - The subject number
 # - TEMPLATEFLOW_HOST_HOME - The TemplateFlow host home directory
-# - APPTAINERENV_TEMPLATEFLOW_HOME - The TemplateFlow environment variable
+# - SINGULARITYENV_TEMPLATEFLOW_HOME - The TemplateFlow environment variable
 
 # Usage: slurm_proc_anat.sh -p <project> -s <session> -z <subject> -m <minqc> -f <fieldmaps> -l <longitudinal> -b <base_dir> -t <version> -a <delta_proj>
 # Example: sbatch slurm_proc_anat.sh -p BIC -s ses-01 -z 001 -m no -f yes -l yes -b /scratch/${delta_proj}/BICpipeline -t prisma -a bcgn
@@ -65,7 +65,7 @@ sub=${subject:4}
 
 # if delta_proj is not "local", set the following variables
 if [ "${delta_proj}" != "local" ]; then
-    IMAGEDIR=/projects/bcgn/apptainer_images
+    IMAGEDIR=/projects/bcgn/singularity_images
     tmpdir=/work/hdd/${delta_proj}/tmp
     scripts=/work/hdd/${delta_proj}/scripts
     stmpdir=/work/hdd/${delta_proj}/stmp
@@ -75,7 +75,7 @@ if [ "${delta_proj}" != "local" ]; then
 # /projects/bdpf/BICpipeline/terra/scripts/cups
 # other wise paths start with ${base_dir}
 else
-    IMAGEDIR=${base_dir}/apptainer_images
+    IMAGEDIR=${base_dir}/singularity_images
     tmpdir=${base_dir}/${version}/tmp
     scripts=${base_dir}/${version}/scripts
     stmpdir=${base_dir}/${version}/scratch/stmp
@@ -84,20 +84,20 @@ else
     scripts=${base_dir}/${version}/scripts
 fi
 
-# if apptainer is not found and apptainer is not found in the path, exit code 20 for lacking apptainer or apptainer
-if which apptainer; then
-    echo `apptainer --version`
+# if singularity is not found and apptainer is not found in the path, exit code 20 for lacking singularity or apptainer
+if which singularity; then
+    echo `singularity --version`
 elif which apptainer; then
     echo `apptainer --version`
 else
-    echo "apptainer and apptainer not in path"
-    # try to load apptainer or apptainer module, if neither works exit code 20 for lacking apptainer or apptainer
-    if module load apptainer; then
-        echo `apptainer --version`
+    echo "singularity and apptainer not in path"
+    # try to load singularity or apptainer module, if neither works exit code 20 for lacking singularity or apptainer
+    if module load singularity; then
+        echo `singularity --version`
     elif module load apptainer; then
         echo `apptainer --version`
     else
-        echo "apptainer and apptainer not in path"
+        echo "singularity and apptainer not in path"
         exit 20
     fi
 fi
@@ -111,13 +111,13 @@ if [ ! -f "${CONFIG_JSON}" ]; then
     echo "Config file not found"
     exit 17
 fi
-FMRIPREP_VERSION=$(apptainer exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.FMRIPREP_VERSION' /scripts/config.json)
-SLURM_CPUS_PER_TASK=$(apptainer exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.SLURM_CPUS_PER_TASK' /scripts/config.json)
-FMRIPREP_MEMORY_GB=$(apptainer exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.FMRIPREP_MEMORY_GB' /scripts/config.json)
-MRIQC_VERSION=$(apptainer exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.MRIQC_VERSION' /scripts/config.json)
-ANAT_ONLY=$(apptainer exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.ANAT_ONLY' /scripts/config.json)
-LAYNII_VERSION=$(apptainer exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.LAYNII_VERSION' /scripts/config.json)
-LAYNII_DENOISE_BETA=$(apptainer exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.LAYNII_DENOISE_BETA' /scripts/config.json)
+FMRIPREP_VERSION=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.FMRIPREP_VERSION' /scripts/config.json)
+SLURM_CPUS_PER_TASK=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.SLURM_CPUS_PER_TASK' /scripts/config.json)
+FMRIPREP_MEMORY_GB=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.FMRIPREP_MEMORY_GB' /scripts/config.json)
+MRIQC_VERSION=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.MRIQC_VERSION' /scripts/config.json)
+ANAT_ONLY=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.ANAT_ONLY' /scripts/config.json)
+LAYNII_VERSION=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.LAYNII_VERSION' /scripts/config.json)
+LAYNII_DENOISE_BETA=$(singularity exec --contain --no-home -B ${CONFIG_JSON}:/scripts/config.json ${IMAGEDIR}/jq.sif jq -r '.LAYNII_DENOISE_BETA' /scripts/config.json)
 # if ANAT_ONLY "null", exit code 42 for wrong script
 if [ "${ANAT_ONLY}" == "null" ]; then
     echo "ANAT_ONLY is null, please use the correct script"
@@ -134,7 +134,7 @@ mkdir -p ${projDir}/bids/derivatives/sourcedata/
 # if version is terra and mp2rage files exist in ${anat_dir}, then we denoise the MP2RAGE UNI image using LAYNII
 if [ "${version}" == "terra" ] && [ -f "${anat_dir}/sub-${sub}_ses-${ses}_acq-mp2rageinv_run-1_T1w.nii.gz" ] && [ -f "${anat_dir}/sub-${sub}_ses-${ses}_acq-mp2rageinv_run-2_T1w.nii.gz" ] && [ -f "${anat_dir}/sub-${sub}_ses-${ses}_acq-mp2rageuni_run-3_T1w.nii.gz" ]; then
     echo "Denoising MP2RAGE with LAYNII"
-	APPTAINER_CACHEDIR=$CACHESING APPTAINER_TMPDIR=$TMPSING apptainer exec --cleanenv --bind ${anat_dir}:/datain $IMAGEDIR/laynii-v2.1.1.sif \
+	SINGULARITY_CACHEDIR=$CACHESING SINGULARITY_TMPDIR=$TMPSING singularity exec --cleanenv --bind ${anat_dir}:/datain $IMAGEDIR/laynii-v2.1.1.sif \
         /opt/laynii2/laynii/LN_MP2RAGE_DNOISE -INV1 /datain/sub-${sub}_ses-${ses}_acq-mp2rageinv_run-1_T1w.nii.gz \
         -INV2 /datain/sub-${sub}_ses-${ses}_acq-mp2rageinv_run-2_T1w.nii.gz -UNI /datain/sub-${sub}_ses-${ses}_acq-mp2rageuni_run-3_T1w.nii.gz -beta ${LAYNII_DENOISE_BETA}
 	mv ${anat_dir}/*inv* ${projDir}/bids/derivatives/sourcedata/
@@ -201,10 +201,10 @@ chmod 730 -R $CACHESING
 chmod 730 -R $TMPSING
 
 TEMPLATEFLOW_HOST_HOME=$IMAGEDIR/templateflow
-export APPTAINERENV_TEMPLATEFLOW_HOME="/imgdir/templateflow"
+export SINGULARITYENV_TEMPLATEFLOW_HOME="/imgdir/templateflow"
 MPLCONFIG=${TMPSING}/mpl
 mkdir ${MPLCONFIG}
-export APPTAINERENV_MPLCONFIGDIR=/sing_scratch/mpl
+export SINGULARITYENV_MPLCONFIGDIR=/sing_scratch/mpl
 
 	cd ${projDir}/bids/sourcedata/${subject}/${sesname}/anat/
 	echo "`ls *DREAM*`" >> ${projDir}/bids/sourcedata/.bidsignore
@@ -219,7 +219,7 @@ mkdir -p ${projDir}/${DERIVATIVES_DIR}/mriqc
 
 echo "Running MRIQC"
 APPTAINER_CACHEDIR=$CACHESING APPTAINER_TMPDIR=$TMPSING apptainer run --contain --no-home --cleanenv \
---bind ${TEMPLATEFLOW_HOST_HOME}:${APPTAINERENV_TEMPLATEFLOW_HOME} \
+--bind ${TEMPLATEFLOW_HOST_HOME}:${SINGULARITYENV_TEMPLATEFLOW_HOME} \
 --bind ${projDir}/${SOURCEDATA_DIR}:/data,${projDir}/${DERIVATIVES_DIR}/mriqc:/out \
 $IMAGEDIR/mriqc-v${MRIQC_VERSION}.sif /data /out participant \
 --participant-label ${sub} \
