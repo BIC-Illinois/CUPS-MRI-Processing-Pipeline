@@ -2,9 +2,7 @@
     "FMRIPREP_VERSION": "23.2.2",
     "SLURM_CPUS_PER_TASK": 24,
     "FMRIPREP_MEMORY_GB": 192,
-    "MRIQC_VERSION": "24.0.2",
-    "MRIQC_NOSUB": true,
-    "ANAT_ONLY": true,
+    "ANAT_ONLY": false,
     "LAYNII_VERSION": "2.1.1",
     "LAYNII_DENOISE_BETA": "0.4"
 }
