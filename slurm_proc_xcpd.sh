@@ -112,7 +112,7 @@ APPTAINER_CACHEDIR=${CACHESING} APPTAINER_TMPDIR=${TMPSING} apptainer run \
 --file-format nifti --linc-qc y --min-coverage 0.25 --output-type interpolated \
 --warp-surfaces-native2std n --abcc-qc y \
 --lower-bpf 0.01 --upper-bpf 0.08 --bpf-order 2 \
---notrack --write-graph -vvv \
+--notrack --write-graph -vv --create-matrices all \
 --mode none -f 0 -w /sing_scratch --notrack --fs-license-file /imgdir/license.txt \
 /data/bids/derivatives/fmriprep /data/bids/derivatives/xcp_d participant
 
