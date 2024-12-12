@@ -65,9 +65,9 @@ sub=${subject:4}
 if [ "${delta_proj}" != "local" ]; then
     IMAGEDIR=/projects/bcgn/singularity_images
     scripts=/projects/${delta_proj}/scripts
-    stmpdir=/scratch/${delta_proj}/stmp
-    scachedir=/scratch/${delta_proj}/scache
-    projDir=/scratch/${delta_proj}/BICpipeline/${version}/testing/${project}
+    stmpdir=/work/hdd/${delta_proj}/stmp
+    scachedir=/work/hdd/${delta_proj}/scache
+    projDir=/work/hdd/${delta_proj}/BICpipeline/${version}/testing/${project}
     scripts=/projects/${delta_proj}/BICpipeline/${version}/scripts/cups
 # other wise paths start with ${base_dir}
 else
@@ -141,8 +141,8 @@ echo "QSIprep started $NOW" >> ${scripts}/fulltimer.txt
 SINGULARITY_CACHEDIR=${CACHESING} SINGULARITY_TMPDIR=${TMPSING} singularity run \
 --no-home --cleanenv --bind ${IMAGEDIR}:/imgdir,${CACHESING}:/sing_scratch,${projDir}:/data \
 ${IMAGEDIR}/qsiprep-v${QSIPREP_VERSION}.sif \
---fs-license-file /imgdir/license.txt /data/${SOURCEDATA_DIR} /data/${DERIVATIVES_DIR} \
---output-resolution ${OUTPUT_RESOLUTION} -w /sing_scratch \
+--fs-license-file /imgdir/license.txt /data/${SOURCEDATA_DIR} /data/${DERIVATIVES_DIR}/qsiprep \
+--output-resolution ${OUTPUT_RESOLUTION} -w /sing_scratch --denoise-method patch2self \
 --nthreads ${num_cpus} --omp-nthreads $((num_cpus / 2)) --mem $((QSIPREP_MEMORY_GB * 1000)) \
 -vv --notrack \
 participant --participant-label ${subject}

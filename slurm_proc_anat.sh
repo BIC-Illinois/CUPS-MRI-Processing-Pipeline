@@ -219,12 +219,12 @@ mkdir -p ${projDir}/${DERIVATIVES_DIR}/mriqc
 
 echo "Running MRIQC"
 APPTAINER_CACHEDIR=$CACHESING APPTAINER_TMPDIR=$TMPSING apptainer run --contain --no-home --cleanenv \
---bind ${TEMPLATEFLOW_HOST_HOME}:${SINGULARITYENV_TEMPLATEFLOW_HOME} \
+--bind ${TEMPLATEFLOW_HOST_HOME}:${SINGULARITYENV_TEMPLATEFLOW_HOME},${CACHESING}:/work \
 --bind ${projDir}/${SOURCEDATA_DIR}:/data,${projDir}/${DERIVATIVES_DIR}/mriqc:/out \
 $IMAGEDIR/mriqc-v${MRIQC_VERSION}.sif /data /out participant \
 --participant-label ${sub} \
 --session-id ${ses} \
--v --no-sub
+-w /work -v --no-sub
 
 chmod 730 -R ${projDir}/${DERIVATIVES_DIR}/mriqc/${subject}/${sesname}
 
