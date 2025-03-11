@@ -247,9 +247,38 @@ ${IMAGEDIR}/fmriprep-v${FMRIPREP_VERSION}.sif \
 -vv --notrack --anat-only \
 participant --participant-label ${subject}
 
-chmod 744 -R ${projDir}/${DERIVATIVES_DIR}/fmriprep/${subject}/${sesname}
+chmod 740 -R ${projDir}/${DERIVATIVES_DIR}/fmriprep/${subject}/${sesname}
 NOW=$(date +"%m-%d-%Y-%T")
 echo "fMRIPrep finished $NOW" >> ${scripts}/fulltimer.txt
+
+if [ "${version}" == "terra" ] && [ "${project}" != "CUPS" ] && [ -f "${anat_dir}/sub-${sub}_ses-${ses}_acq-mp2rageunidenoised_T1w.nii.gz" ]; then
+    echo "Denoised MP2RAGE file found"
+    T1W="sub-${sub}_ses-${ses}_acq-mp2rageunidenoised_T1w.nii.gz"
+    HIPPO="sub-${sub}_ses-${ses}_acq-highreshippocampus_run-1_T2w.nii.gz"
+    ATLAS="ashs_atlas_umcutrecht_7t_20170810"
+# else if the version is terra and no MP2RAGE files are found, then we echo a message
+elif [ "${version}" == "terra" ] && [ "${project}" == "CUPS" ]; then
+    T1W="sub-${sub}_ses-${ses}_acq-mp2rageunidenoised_T1w.nii.gz"
+    HIPPO="${subject}_${sesname}_acq-highreshippocampus_run-1_T2starw.nii.gz"
+    ATLAS="ashs_atlas_umcutrecht_7t_20170810"
+elif [ "${version}" == "prisma" ]; then
+    T1W="sub-${sub}_ses-${ses}_T1w.nii.gz"
+    HIPPO="sub-${sub}_ses-${ses}_acq-highreshippocampus_run-1_T2w.nii.gz"
+    ATLAS="ashs_atlas_upennpmc_20170810"
+fi
+
+if [ -f "${projDir}/bids/sourcedata/${subject}/${sesname}/anat/${HIPPO}" ]; then
+echo "Running ASHS on ${subject} ${sesname}"
+
+export APPTAINERENV_ASHS_ROOT=/opt/ashs/ashs-1.0.0
+APPTAINER_CACHEDIR=$CACHESING APPTAINER_TMPDIR=$TMPSING apptainer exec --containall --no-home --cleanenv \
+--bind ${projDir}/bids:/datain,${IMAGEDIR}/ashs_config.sh:/opt/ashs/ashs-1.0.0/bin/ashs_config.sh \
+$IMAGEDIR/ashs-1.0.0.sif $APPTAINERENV_ASHS_ROOT/bin/ashs_main.sh -a /opt/ashs/${ATLAS} \
+-g /datain/sourcedata/${subject}/${sesname}/anat/${T1W} \
+-f /datain/sourcedata/${subject}/${sesname}/anat/${HIPPO} \
+-w /datain/derivatives/ashs/${subject}/${sesname} 
+
+fi
 
 rm -rf ${CACHESING}
 rm -rf ${TMPSING}
