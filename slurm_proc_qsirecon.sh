@@ -1,7 +1,7 @@
 #!/bin/bash
-# This script is used to run QSIPrep reconstruction on dMRI data.
+# This script is used to run QSIRecon reconstruction on dMRI data.
 # It takes various input parameters and sets up the necessary environment variables.
-# The script then runs the QSIPrep reconstruction command using Singularity/Apptainer containers.
+# The script then runs the QSIRecon reconstruction command using Singularity/Apptainer containers.
 
 # Input parameters:
 # -p: CLEANPROJECT - The project name
@@ -116,6 +116,11 @@ else
     fi
 fi
 
+# Fix for Freesurfer run in fMRIPrep v23.0.2
+cp ${projDir}/${DERIVATIVES_DIR}/${fs_dir}/${subject}/surf/lh.pial.T1  ${projDir}/${DERIVATIVES_DIR}/${fs_dir}/${subject}/surf/lh.pial
+cp ${projDir}/${DERIVATIVES_DIR}/${fs_dir}/${subject}/surf/rh.pial.T1  ${projDir}/${DERIVATIVES_DIR}/${fs_dir}/${subject}/surf/rh.pial
+
+
 mkdir $CACHESING -p
 mkdir $TMPSING -p
 chmod 730 -R $CACHESING
@@ -135,6 +140,7 @@ echo "QSIRecon "${recon}" started "$NOW >> ${scripts}/fulltimer.txt
 
 APPTAINERENV_MPLCONFIGDIR=/sing_scratch/mpl APPTAINER_CACHEDIR=${CACHESING} APPTAINER_TMPDIR=${TMPSING} apptainer run \
 --no-home --cleanenv --containall --bind ${IMAGEDIR}:/imgdir,${CACHESING}:/sing_scratch,${projDir}:/data \
+-B ${scripts}/FreeSurferColorLUT.txt:/opt/freesurfer/FreeSurferColorLUT.txt \
 ${IMAGEDIR}/qsirecon-v${QSIRECON_VERSION}.sif \
 --fs-license-file /imgdir/license.txt /data/${DERIVATIVES_DIR}/qsiprep /data/${DERIVATIVES_DIR}/qsirecon \
 --output-resolution ${OUTPUT_RESOLUTION} -w /sing_scratch \
