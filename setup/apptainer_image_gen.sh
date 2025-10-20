@@ -32,6 +32,12 @@ apptainer build laynii-2.0.0.sif laynii.def
 apptainer build ashs-1.0.0.sif ashs.def
 apptainer build pylearn.sif pylearn.def
 
+# Install QSMxT and dependencies
+git clone https://github.com/astewartau/transparent-apptainer qsmxt_8.1.3_20250827
+cd qsmxt_8.1.3_20250827
+./run_transparent_apptainer.sh --container qsmxt_8.1.3_20250827.simg
+source activate_qsmxt_8.1.3_20250827.simg.sh
+
 # The following examples use the CUDA 10.2 toolkit and runtime (loaded via module or native install)
 # These are not required for most of the pipeline, but are included for DTI tractography and network-based statistics respectively
 apptainer build scfsl_gpu-v0.3.2.sif docker://mrfilbi/scfsl_gpu:0.3.2
