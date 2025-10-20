@@ -71,3 +71,5 @@ num_cpus=${SLURM_CPUS_PER_TASK}
 echo "Running QSM with n_cpus = ${SLURM_CPUS_PER_TASK}"
 
 cd $projDir
+
+qsmxt $projDir/bids/sourcedata --premade 'gre' --do_qsm --do_swi --do_t2starmap --do_r2starmap --do_segmentation --do_analysis --do_template --auto_yes
