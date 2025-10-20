@@ -151,6 +151,12 @@ chmod 730 -R ${projDir}/${DERIVATIVES_DIR}/qsiprep/${subject}/${sesname}
 NOW=$(date +"%m-%d-%Y-%T")
 echo "QSIprep finished $NOW" >> ${scripts}/fulltimer.txt
 
+
+ANTS_VERSION="v2.6.3"
+SINGULARITY_CACHEDIR=${CACHESING} SINGULARITY_TMPDIR=${TMPSING} singularity run \
+--no-home --cleanenv --bind ${scripts}:${scripts},${CACHESING}:/sing_scratch,${projDir}:/data \
+${IMAGEDIR}/ants-${ANTS_VERSION}.sif ${scripts}/refine_qsiprep_coreg.sh -b ${projDir}/${DERIVATIVES_DIR} -z ${subject}
+
 rm -rf ${CACHESING}
 rm -rf ${TMPSING}
 
