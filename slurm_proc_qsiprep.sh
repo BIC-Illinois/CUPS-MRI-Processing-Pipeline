@@ -157,6 +157,12 @@ SINGULARITY_CACHEDIR=${CACHESING} SINGULARITY_TMPDIR=${TMPSING} singularity run 
 --no-home --cleanenv --bind ${scripts}:${scripts},${CACHESING}:/sing_scratch,${projDir}:/data \
 ${IMAGEDIR}/ants-${ANTS_VERSION}.sif ${scripts}/refine_qsiprep_coreg.sh -b ${projDir}/${DERIVATIVES_DIR} -z ${subject}
 
+echo "Generating HTML report for coregistration visualization"
+SINGULARITY_CACHEDIR=${CACHESING} SINGULARITY_TMPDIR=${TMPSING} singularity run \
+--no-home --cleanenv --bind ${projDir}/${DERIVATIVES_DIR}/qsiprep/${subject}:/data \
+${IMAGEDIR}/coreg.sif /data/anat/${subject}_space-ACPC_desc-preproc_T1w.nii.gz /data/${session}/dwi/${subject}_${session}_space-ACPC_dwiref.nii.gz /data/${session}/coreg_refine/${subject}_${session}_space-ACPC_desc-dwirefT1wCoReg.html
+echo "See ${projDir}/${DERIVATIVES_DIR}/qsiprep/${subject}/${session}/coreg_refine/${subject}_${session}_space-ACPC_desc-dwirefT1wCoReg.html"
+
 rm -rf ${CACHESING}
 rm -rf ${TMPSING}
 
